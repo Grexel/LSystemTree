@@ -35,57 +35,57 @@ public class LSystemTurtle {
             char subChar = details.charAt(i);
             switch(subChar){
                 case 'A': lineList.add(moveForward(5));
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'B': lineList.add(moveForward(5));
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'C': lineList.add(moveForward(7));
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'D': lineList.add(moveForward(7)); 
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'E': lineList.add(moveForward(9)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'F': lineList.add(moveForward(9)); 
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'G': lineList.add(moveForward(11)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'H': lineList.add(moveForward(11)); 
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'I': lineList.add(moveForward(13)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'J': lineList.add(moveForward(13)); 
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'K': lineList.add(moveForward(15));
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'L': lineList.add(moveForward(15)); 
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'M': lineList.add(moveForward(17)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'N': lineList.add(moveForward(17)); 
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'O': lineList.add(moveForward(19)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'P': lineList.add(moveForward(19));
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'Q': lineList.add(moveForward(21)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'R': lineList.add(moveForward(21)); 
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'S': lineList.add(moveForward(23)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'T': lineList.add(moveForward(23));
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'U': lineList.add(moveForward(25)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'V': lineList.add(moveForward(25)); 
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'W': lineList.add(moveForward(23)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'X': lineList.add(moveForward(24));
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case 'Y': lineList.add(moveForward(25)); 
-                    direction += angleChange; break;
+                    rotate(angleChange); break;
                 case 'Z': lineList.add(moveForward(26)); 
-                    direction -= angleChange; break;
+                    rotate(-angleChange); break;
                 case '[': turtleStack.push(
                         new TurtleDetails(new Point2D.Double(position.x,position.y),direction)); 
                     break;
@@ -96,8 +96,8 @@ public class LSystemTurtle {
                         direction = tD.direction;
                     }
                     break;
-                case '-': direction -= angleChange; break;
-                case '+': direction += angleChange; break;
+                case '-': rotate(-angleChange); break;
+                case '+': rotate(angleChange); break;
             }
         }
         plant.branches = lineList;
@@ -108,6 +108,9 @@ public class LSystemTurtle {
         position.x = x + distance *3* Math.cos(direction);
         position.y = y + distance *3* Math.sin(direction);
         return new Line2D.Double(x,y,position.x, position.y);
+    }
+    public void rotate(double angle){
+        direction += angle;
     }
 }
 class TurtleDetails{

@@ -24,6 +24,14 @@ public class LSystemTrees extends JFrame implements ActionListener{
     private static final int IMAGE_WIDTH = 800;
     private static final int IMAGE_HEIGHT = 600;
     final JFileChooser fc = new JFileChooser();
+    
+    public JButton pickForegroundColor;
+    public Color foregroundColor;
+    public JButton pickBackgroundColor;
+    public Color backgroundColor;
+    public JColorChooser foregroundChooser;
+    public JColorChooser backgroundChooser;
+    
     public JLabel drawingLabel;
     public JScrollPane imageScroll;
     public JPanel mainPanel,imagePanel;
@@ -34,6 +42,7 @@ public class LSystemTrees extends JFrame implements ActionListener{
     public BufferedImage drawingImage;
     public Graphics2D imageGraphics;
     public JButton saveImageButton;
+    
     public LSystemPlant plant;
     
     public LSystemTrees(String title){
@@ -64,7 +73,19 @@ public class LSystemTrees extends JFrame implements ActionListener{
         redoPlantButton.addActionListener(this);
         saveImageButton = new JButton("Save Image");
         saveImageButton.addActionListener(this);
+        pickForegroundColor = new JButton("Foreground Color");
+        pickForegroundColor.addActionListener(this);
+        pickBackgroundColor = new JButton("Background Color");
+        pickBackgroundColor.addActionListener(this);
+        foregroundColor = Color.WHITE;
+        backgroundColor = Color.BLACK;
+        pickForegroundColor.setBackground(foregroundColor);
+        pickForegroundColor.setBackground(backgroundColor);
+        foregroundChooser = new JColorChooser(foregroundColor);
+        backgroundChooser = new JColorChooser(backgroundColor);
+        
         iterationTF = new JTextField(10);
+        iterationTF.setText("5");
         iterationLbl = new JLabel("# of Iterations");
         mainPanel.setOpaque(true);
     }
@@ -95,19 +116,36 @@ public class LSystemTrees extends JFrame implements ActionListener{
         c.gridy = 3;
         mainPanel.add(redoPlantButton, c);
         c.gridx = 8;
+        c.gridy = 4;
+        mainPanel.add(pickForegroundColor, c);
+        c.gridx = 8;
         c.gridy = 5;
+        mainPanel.add(pickBackgroundColor, c);
+        c.gridx = 8;
+        c.gridy = 6;
         mainPanel.add(saveImageButton, c);
     }
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == newPlantButton){
             plant = new LSystemPlant();
+            iterationTF.setText("5");
             drawPlantOnScreen();
         }
         if(e.getSource() == redoPlantButton){
             plant.grow(Integer.parseInt(iterationTF.getText()));
             plant.parseGenetics();
             drawPlantOnScreen();
+        }
+        if(e.getSource() == pickForegroundColor){
+            Color newColor = foregroundChooser.showDialog(this,"Pick foreground color.",foregroundColor);
+            foregroundColor = newColor;
+            pickForegroundColor.setBackground(newColor);
+        }
+        if(e.getSource() == pickBackgroundColor){
+            Color newColor = backgroundChooser.showDialog(this,"Pick foreground color.",backgroundColor);
+            backgroundColor = newColor;
+            pickBackgroundColor.setBackground(newColor);
         }
         if (e.getSource() == saveImageButton) {
             int returnVal = fc.showSaveDialog(this);
@@ -158,9 +196,9 @@ public class LSystemTrees extends JFrame implements ActionListener{
         imageGraphics.addRenderingHints(hints);
         
         //draw plant
-        imageGraphics.setColor(Color.BLACK);
-        imageGraphics.clearRect(0, 0, drawingImage.getWidth(), drawingImage.getHeight());
-        imageGraphics.setColor(Color.RED);
+        imageGraphics.setColor(backgroundColor);
+        imageGraphics.fillRect(0, 0, drawingImage.getWidth(), drawingImage.getHeight());
+        imageGraphics.setColor(foregroundColor);
         imageGraphics.setStroke(new BasicStroke(2));
         for(Line2D.Double line : plant.branches){
             //xL and yT are offsets 
