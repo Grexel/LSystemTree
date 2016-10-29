@@ -27,14 +27,6 @@ public class LSystemTurtle {
         position = new Point2D.Double(400,600);
         angleChange = Math.PI/18; // about 10 degrees
     }
-    
-    public void setPosition(int x, int y){
-        position.x = x;
-        position.y = y;
-    }
-    public BufferedImage drawPlant(LSystemPlant plant){
-        return null;
-    }
     public void buildGenetics(LSystemPlant plant){
         ArrayList<Line2D.Double> lineList = new ArrayList<>();
         turtleStack.clear();
@@ -104,8 +96,8 @@ public class LSystemTurtle {
                         direction = tD.direction;
                     }
                     break;
-                case '-': direction += angleChange; break;
-                case '+': direction -= angleChange; break;
+                case '-': direction -= angleChange; break;
+                case '+': direction += angleChange; break;
             }
         }
         plant.branches = lineList;

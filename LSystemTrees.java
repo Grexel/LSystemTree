@@ -40,20 +40,22 @@ public class LSystemTrees extends JFrame implements ActionListener{
         super(title);
         fc.addChoosableFileFilter(new FileNameExtensionFilter(".png","png"));
         fc.setAcceptAllFileFilterUsed(false);
-       
-        
         plant = new LSystemPlant();
+        initializeSwingComponents();
+        initializeLayout();
+        
+    }
+    
+    public void initializeSwingComponents(){
         mainPanel = new JPanel();
         drawingImage = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT,
                 BufferedImage.TYPE_INT_ARGB);
         imageGraphics = drawingImage.createGraphics();
         drawingLabel = new JLabel(new ImageIcon(drawingImage));
         imagePanel = new JPanel();
-        //imagePanel.setPreferredSize(new Dimension(800,600));
         imagePanel.add(drawingLabel);
         
         imageScroll = new JScrollPane(imagePanel);
-        //imageScroll.setPreferredSize((new Dimension(800,600)));
         imageScroll.setAutoscrolls(true);
         
         newPlantButton = new JButton("Random Plant");
@@ -65,6 +67,8 @@ public class LSystemTrees extends JFrame implements ActionListener{
         iterationTF = new JTextField(10);
         iterationLbl = new JLabel("# of Iterations");
         mainPanel.setOpaque(true);
+    }
+    public void initializeLayout(){
         mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 0.0;
@@ -93,26 +97,16 @@ public class LSystemTrees extends JFrame implements ActionListener{
         c.gridx = 8;
         c.gridy = 5;
         mainPanel.add(saveImageButton, c);
-        
-        RenderingHints hints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        imageGraphics.addRenderingHints(hints);
-
     }
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == newPlantButton){
             plant = new LSystemPlant();
-            //System.out.println(plant.finalGrowth);
-            //draw on display
             drawPlantOnScreen();
         }
         if(e.getSource() == redoPlantButton){
             plant.grow(Integer.parseInt(iterationTF.getText()));
             plant.parseGenetics();
-            //System.out.println(plant.finalGrowth);
-            //draw on display
             drawPlantOnScreen();
         }
         if (e.getSource() == saveImageButton) {
@@ -120,8 +114,6 @@ public class LSystemTrees extends JFrame implements ActionListener{
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File outputFile = fc.getSelectedFile();
-                //This is where a real application would open the file.try {
-                // retrieve imageFile file = chooser.getSelectedFile();
                 String fname = outputFile.getAbsolutePath();
 
                 if(!fname.endsWith(".png") ) {
@@ -139,6 +131,8 @@ public class LSystemTrees extends JFrame implements ActionListener{
     
     public void drawPlantOnScreen(){
         double xL = 0,xR = 0,yT = 0,yB = 0;
+        
+        //get the boundary for the plant
         for(Line2D.Double line : plant.branches){
             if(line.x1 < xL) xL = line.x1;
             if(line.x2 < xL) xL = line.x2;
@@ -149,6 +143,8 @@ public class LSystemTrees extends JFrame implements ActionListener{
             if(line.y1 > yB) yB = line.y1;
             if(line.y2 > yB) yB = line.y2;
         }
+        
+        //reset the image, drawinglabel, and graphics2D.
         Rectangle2D.Double rect = new Rectangle2D.Double(xL,yT,xR - xL,yB - yT);
         drawingImage = new BufferedImage((int)rect.width, (int)rect.height,
                 BufferedImage.TYPE_INT_ARGB);
@@ -156,11 +152,18 @@ public class LSystemTrees extends JFrame implements ActionListener{
         drawingLabel.setIcon(new ImageIcon(drawingImage));
         imagePanel.setPreferredSize(new Dimension(drawingImage.getWidth(),drawingImage.getHeight()));
         imageGraphics = drawingImage.createGraphics();
+        RenderingHints hints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        imageGraphics.addRenderingHints(hints);
+        
+        //draw plant
         imageGraphics.setColor(Color.BLACK);
         imageGraphics.clearRect(0, 0, drawingImage.getWidth(), drawingImage.getHeight());
         imageGraphics.setColor(Color.RED);
         imageGraphics.setStroke(new BasicStroke(2));
         for(Line2D.Double line : plant.branches){
+            //xL and yT are offsets 
             imageGraphics.drawLine((int)(line.x1-xL), (int)(line.y1-yT ), (int)(line.x2-xL), (int)(line.y2-yT));
         }
         
