@@ -29,6 +29,8 @@ public class LSystemTrees extends JFrame implements ActionListener{
     public Color foregroundColor;
     public JButton pickBackgroundColor;
     public Color backgroundColor;
+    public JButton pickBarkColor;
+    public Color barkColor = Color.ORANGE;
     public JColorChooser foregroundChooser;
     public JColorChooser backgroundChooser;
     
@@ -44,7 +46,7 @@ public class LSystemTrees extends JFrame implements ActionListener{
     public JButton saveImageButton;
     
     public LSystemPlant plant;
-    
+    public int maxStrokeWidth = 5;
     public LSystemTrees(String title){
         super(title);
         fc.addChoosableFileFilter(new FileNameExtensionFilter(".png","png"));
@@ -169,9 +171,13 @@ public class LSystemTrees extends JFrame implements ActionListener{
     
     public void drawPlantOnScreen(){
         double xL = 0,xR = 0,yT = 0,yB = 0;
-        
+        int maxBranchesFromRoot = 0;
         //get the boundary for the plant
-        for(Line2D.Double line : plant.branches){
+        for(LSystemBranch branch : plant.branches){
+            maxBranchesFromRoot = (maxBranchesFromRoot < branch.branchesFromRoot())
+                ? branch.branchesFromRoot() : maxBranchesFromRoot ;
+            
+            Line2D.Double line = branch.line();
             if(line.x1 < xL) xL = line.x1;
             if(line.x2 < xL) xL = line.x2;
             if(line.x1 > xR) xR = line.x1;
@@ -200,8 +206,16 @@ public class LSystemTrees extends JFrame implements ActionListener{
         imageGraphics.fillRect(0, 0, drawingImage.getWidth(), drawingImage.getHeight());
         imageGraphics.setColor(foregroundColor);
         imageGraphics.setStroke(new BasicStroke(2));
-        for(Line2D.Double line : plant.branches){
+        for(LSystemBranch branch : plant.branches){
+            Line2D.Double line = branch.line();
+            //make stroke taper off evenly towards the end
+            double strokeWidth = (0.0 + maxStrokeWidth-1) * (1.0- ((double)branch.branchesFromRoot() / (double)maxBranchesFromRoot)) + 1;
             //xL and yT are offsets 
+            imageGraphics.setStroke(new BasicStroke((int)strokeWidth + 2));
+        imageGraphics.setColor(barkColor);
+            imageGraphics.drawLine((int)(line.x1-xL), (int)(line.y1-yT ), (int)(line.x2-xL), (int)(line.y2-yT));
+            imageGraphics.setStroke(new BasicStroke((int)strokeWidth));
+        imageGraphics.setColor(foregroundColor);
             imageGraphics.drawLine((int)(line.x1-xL), (int)(line.y1-yT ), (int)(line.x2-xL), (int)(line.y2-yT));
         }
         

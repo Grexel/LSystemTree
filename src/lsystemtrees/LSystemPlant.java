@@ -17,7 +17,7 @@ public class LSystemPlant {
     private LSystemGenetics geneRules;
     private String seed; //axiom
     public String finalGrowth;
-    public ArrayList<Line2D.Double> branches;
+    public ArrayList<LSystemBranch> branches;
     
     public LSystemPlant(){
         branches = new ArrayList<>();
