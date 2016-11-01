@@ -18,12 +18,22 @@ public class LSystemBranch {
     private Line2D.Double line;
     public void line(Line2D.Double l){line = l;}
     public Line2D.Double line(){return line;}
+    
     private int branchesFromRoot;
     public void branchesFromRoot(int l){branchesFromRoot = l;}
     public int branchesFromRoot(){return branchesFromRoot;}
+    private int branchesFromTip;
+    public void branchesFromTip(int l){branchesFromTip = l;}
+    public int branchesFromTip(){return branchesFromTip;}
     
-    public LSystemBranch(Line2D.Double l, int bfr){
+    public LSystemBranch connectingBranch;
+    public void connectingBranch(LSystemBranch l){connectingBranch = l;}
+    public LSystemBranch connectingBranch(){return connectingBranch;}
+    
+    public LSystemBranch(Line2D.Double l, int bfr, LSystemBranch connector){
         line = l;
         branchesFromRoot = bfr;
+        connectingBranch = connector;
+        branchesFromTip = 0;
     }
 }

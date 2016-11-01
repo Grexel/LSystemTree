@@ -20,12 +20,14 @@ public class LSystemTurtle {
     public double direction;
     public Point2D.Double position;
     public double angleChange;
+    public LSystemBranch lastBranch;
     
     public LSystemTurtle(){
         turtleStack = new Stack<>();
         direction = -Math.PI/2; // heading up to begin with
         position = new Point2D.Double(400,600);
         angleChange = Math.PI/18; // about 10 degrees
+        lastBranch = null;
     }
     public void buildGenetics(LSystemPlant plant){
         ArrayList<LSystemBranch> lineList = new ArrayList<>();
@@ -87,19 +89,21 @@ public class LSystemTurtle {
                 case 'Z': lineList.add(moveForward(26,turtleStack.size())); 
                     rotate(-angleChange); break;
                 case '[': turtleStack.push(
-                        new TurtleDetails(new Point2D.Double(position.x,position.y),direction)); 
+                        new TurtleDetails(new Point2D.Double(position.x,position.y),direction,lastBranch)); 
                     break;
                 case ']': if(!turtleStack.empty()) { 
                         TurtleDetails tD = turtleStack.pop();
                         position.x = tD.position.x;
                         position.y = tD.position.y;
                         direction = tD.direction;
+                        lastBranch = tD.branch;
                     }
                     break;
                 case '-': rotate(-angleChange); break;
                 case '+': rotate(angleChange); break;
             }
         }
+        calculateBranchesFromTip(lineList);
         plant.branches = lineList;
     }
     public LSystemBranch moveForward(double distance,int branchesFromRoot){
@@ -107,17 +111,42 @@ public class LSystemTurtle {
         double y = position.y;
         position.x = x + distance *3* Math.cos(direction);
         position.y = y + distance *3* Math.sin(direction);
-        return new LSystemBranch(new Line2D.Double(x,y,position.x, position.y),branchesFromRoot);
+        LSystemBranch br = new LSystemBranch(new Line2D.Double(x,y,position.x, position.y),branchesFromRoot,lastBranch);
+        lastBranch = br;
+        return br;
     }
+    
     public void rotate(double angle){
         direction += angle;
+    }
+    public void calculateBranchesFromTip(ArrayList<LSystemBranch> lineList){
+        //iterate down through branches, checking branchesfromtip, 
+        //if branches > branch.fromtip, branch.fromtip = branch
+        for(LSystemBranch branch : lineList){
+            int branches = 0; // default is it's a tip.
+            //connectingBranch will be null if it's the root
+            if(branch.connectingBranch() != null){
+                LSystemBranch currentBranch = branch;
+                do
+                {
+                    LSystemBranch nextBranch = currentBranch.connectingBranch();
+                    branches++;
+                    if(nextBranch.branchesFromTip() < branches){
+                        nextBranch.branchesFromTip(branches);
+                    }
+                    currentBranch = nextBranch;
+                }while(currentBranch.connectingBranch() != null);
+            }
+        }
     }
 }
 class TurtleDetails{
     public Point2D.Double position;
     public double direction;
-    public TurtleDetails(Point2D.Double pos, double dir){
+    public LSystemBranch branch;
+    public TurtleDetails(Point2D.Double pos, double dir, LSystemBranch connection){
         position = pos;
         direction = dir;
+        branch = connection;
     }
 }

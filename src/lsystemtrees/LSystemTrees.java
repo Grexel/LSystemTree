@@ -31,8 +31,7 @@ public class LSystemTrees extends JFrame implements ActionListener{
     public Color backgroundColor;
     public JButton pickBarkColor;
     public Color barkColor = Color.ORANGE;
-    public JColorChooser foregroundChooser;
-    public JColorChooser backgroundChooser;
+    public JColorChooser colorChooser;
     
     public JLabel drawingLabel;
     public JScrollPane imageScroll;
@@ -46,7 +45,7 @@ public class LSystemTrees extends JFrame implements ActionListener{
     public JButton saveImageButton;
     
     public LSystemPlant plant;
-    public int maxStrokeWidth = 5;
+    public double maxStrokeWidth = 10;
     public LSystemTrees(String title){
         super(title);
         fc.addChoosableFileFilter(new FileNameExtensionFilter(".png","png"));
@@ -79,12 +78,13 @@ public class LSystemTrees extends JFrame implements ActionListener{
         pickForegroundColor.addActionListener(this);
         pickBackgroundColor = new JButton("Background Color");
         pickBackgroundColor.addActionListener(this);
+        pickBarkColor = new JButton("Bark Color");
+        pickBarkColor.addActionListener(this);
         foregroundColor = Color.WHITE;
         backgroundColor = Color.BLACK;
         pickForegroundColor.setBackground(foregroundColor);
         pickForegroundColor.setBackground(backgroundColor);
-        foregroundChooser = new JColorChooser(foregroundColor);
-        backgroundChooser = new JColorChooser(backgroundColor);
+        colorChooser = new JColorChooser(foregroundColor);
         
         iterationTF = new JTextField(10);
         iterationTF.setText("5");
@@ -120,6 +120,9 @@ public class LSystemTrees extends JFrame implements ActionListener{
         c.gridy = 5;
         mainPanel.add(pickBackgroundColor, c);
         c.gridx = 15;
+        c.gridy = 6;
+        mainPanel.add(pickBarkColor, c);
+        c.gridx = 15;
         c.gridy = 7;
         mainPanel.add(saveImageButton, c);
         c.weightx = 0.0;
@@ -140,14 +143,19 @@ public class LSystemTrees extends JFrame implements ActionListener{
             drawPlantOnScreen();
         }
         if(e.getSource() == pickForegroundColor){
-            Color newColor = foregroundChooser.showDialog(this,"Pick foreground color.",foregroundColor);
+            Color newColor = colorChooser.showDialog(this,"Pick foreground color.",foregroundColor);
             foregroundColor = newColor;
             pickForegroundColor.setBackground(newColor);
         }
         if(e.getSource() == pickBackgroundColor){
-            Color newColor = backgroundChooser.showDialog(this,"Pick foreground color.",backgroundColor);
+            Color newColor = colorChooser.showDialog(this,"Pick foreground color.",backgroundColor);
             backgroundColor = newColor;
             pickBackgroundColor.setBackground(newColor);
+        }
+        if(e.getSource() == pickBarkColor){
+            Color newColor = colorChooser.showDialog(this,"Pick foreground color.",backgroundColor);
+            barkColor = newColor;
+            pickBarkColor.setBackground(newColor);
         }
         if (e.getSource() == saveImageButton) {
             int returnVal = fc.showSaveDialog(this);
@@ -172,11 +180,13 @@ public class LSystemTrees extends JFrame implements ActionListener{
     public void drawPlantOnScreen(){
         double xL = 0,xR = 0,yT = 0,yB = 0;
         int maxBranchesFromRoot = 0;
+        int maxBranchesFromTip = 0;
         //get the boundary for the plant
         for(LSystemBranch branch : plant.branches){
             maxBranchesFromRoot = (maxBranchesFromRoot < branch.branchesFromRoot())
                 ? branch.branchesFromRoot() : maxBranchesFromRoot ;
-            
+            maxBranchesFromTip = (maxBranchesFromTip < branch.branchesFromTip())
+                ? branch.branchesFromTip() : maxBranchesFromTip ;
             Line2D.Double line = branch.line();
             if(line.x1 < xL) xL = line.x1;
             if(line.x2 < xL) xL = line.x2;
@@ -209,13 +219,14 @@ public class LSystemTrees extends JFrame implements ActionListener{
         for(LSystemBranch branch : plant.branches){
             Line2D.Double line = branch.line();
             //make stroke taper off evenly towards the end
-            double strokeWidth = (0.0 + maxStrokeWidth-1) * (1.0- ((double)branch.branchesFromRoot() / (double)maxBranchesFromRoot)) + 1;
+            double strokeWidth = (0.0 + maxStrokeWidth-1) * (1.0- ((double)branch.branchesFromRoot() / (double)maxBranchesFromRoot))
+                    * ((double)branch.branchesFromTip() / (double)maxBranchesFromTip)  + 1;
             //xL and yT are offsets 
-            imageGraphics.setStroke(new BasicStroke((int)strokeWidth + 2));
-        imageGraphics.setColor(barkColor);
+            imageGraphics.setStroke(new BasicStroke((int)strokeWidth + 3));
+            imageGraphics.setColor(barkColor);
             imageGraphics.drawLine((int)(line.x1-xL), (int)(line.y1-yT ), (int)(line.x2-xL), (int)(line.y2-yT));
             imageGraphics.setStroke(new BasicStroke((int)strokeWidth));
-        imageGraphics.setColor(foregroundColor);
+            imageGraphics.setColor(foregroundColor);
             imageGraphics.drawLine((int)(line.x1-xL), (int)(line.y1-yT ), (int)(line.x2-xL), (int)(line.y2-yT));
         }
         
