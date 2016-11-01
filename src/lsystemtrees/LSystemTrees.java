@@ -39,13 +39,15 @@ public class LSystemTrees extends JFrame implements ActionListener{
     public JButton newPlantButton;
     public JTextField iterationTF;
     public JLabel iterationLbl;
+    public JTextField baseWidthTF;
+    public JLabel baseWidthLbl;
     public JButton redoPlantButton;
     public BufferedImage drawingImage;
     public Graphics2D imageGraphics;
     public JButton saveImageButton;
     
     public LSystemPlant plant;
-    public double maxStrokeWidth = 10;
+    public double maxStrokeWidth = 20;
     public LSystemTrees(String title){
         super(title);
         fc.addChoosableFileFilter(new FileNameExtensionFilter(".png","png"));
@@ -89,6 +91,10 @@ public class LSystemTrees extends JFrame implements ActionListener{
         iterationTF = new JTextField(10);
         iterationTF.setText("5");
         iterationLbl = new JLabel("# of Iterations");
+        
+        baseWidthTF = new JTextField(10);
+        baseWidthTF.setText("10");
+        baseWidthLbl = new JLabel("Width of Trunk");
         mainPanel.setOpaque(true);
     }
     public void initializeLayout(){
@@ -112,22 +118,28 @@ public class LSystemTrees extends JFrame implements ActionListener{
         mainPanel.add(iterationTF, c);
         c.gridx = 15;
         c.gridy = 3;
-        mainPanel.add(redoPlantButton, c);
+        mainPanel.add(baseWidthLbl, c);
         c.gridx = 15;
         c.gridy = 4;
-        mainPanel.add(pickForegroundColor, c);
+        mainPanel.add(baseWidthTF, c);
         c.gridx = 15;
         c.gridy = 5;
-        mainPanel.add(pickBackgroundColor, c);
+        mainPanel.add(redoPlantButton, c);
         c.gridx = 15;
         c.gridy = 6;
-        mainPanel.add(pickBarkColor, c);
+        mainPanel.add(pickForegroundColor, c);
         c.gridx = 15;
         c.gridy = 7;
+        mainPanel.add(pickBackgroundColor, c);
+        c.gridx = 15;
+        c.gridy = 8;
+        mainPanel.add(pickBarkColor, c);
+        c.gridx = 15;
+        c.gridy = 9;
         mainPanel.add(saveImageButton, c);
         c.weightx = 0.0;
         c.gridx = 15;
-        c.gridy = 8;
+        c.gridy = 10;
         mainPanel.add(newPlantButton, c);
     }
     @Override
@@ -135,11 +147,13 @@ public class LSystemTrees extends JFrame implements ActionListener{
         if(e.getSource() == newPlantButton){
             plant = new LSystemPlant();
             iterationTF.setText("5");
+            baseWidthTF.setText("10");
             drawPlantOnScreen();
         }
         if(e.getSource() == redoPlantButton){
             plant.grow(Integer.parseInt(iterationTF.getText()));
             plant.parseGenetics();
+            maxStrokeWidth = Integer.parseInt(baseWidthTF.getText());
             drawPlantOnScreen();
         }
         if(e.getSource() == pickForegroundColor){
